@@ -7,7 +7,7 @@ Created on Sat Feb 12 22:02:24 2022
 import pandas as pd
 import numpy as np
 
-from catbond_class_refactored import CatBond
+from catbond_class import CatBond
 
 # Frecuencia
 path = r'G:\Mi unidad\Tesis (Avances)\BASES\SSNMX_catalogo_19000101_20210913.csv'
