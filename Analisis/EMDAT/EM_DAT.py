@@ -176,7 +176,7 @@ t55['Número de Eventos'] = t3['porcentaje_del_total'].values
 t55 = t55[['index', 'Número de Eventos', 'Afectados', 'Muertes', 'Daño en 000 USD']]
 
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4, figsize = (25, 6), sharey = False)
-fig.suptitle('% Del Total por Subgrupo de Desastre')
+# fig.suptitle('% Del Total por Subgrupo de Desastre')
 axs = [ax1, ax2, ax3, ax4]
 columnas = list(t55.columns)[1:]
 
@@ -198,21 +198,23 @@ test['Total'] = test.values.sum(axis = 1) # Sumamos por renglones
 test.sort_values(['Total'], ascending = [False], inplace = True) # Ordenamos por el total de eventos de mayor a menor
 
 # Figure 6: Mapa de Calor
+top = 10
 plt.figure(dpi = 250, figsize = (12,12))
-plt.title('Mapa de Calor: Top 15 del total de Eventos por País', fontsize = 14)
-ax = sns.heatmap(test.head(15), linewidths = 0.1, annot = True, fmt = '.0f', cbar = False, cmap = 'crest')
+plt.title(f'''Mapa de Calor: Top {top} del total de Eventos por País''', fontsize = 16)
+ax = sns.heatmap(test.head(top), linewidths = 0.1, annot = True, fmt = '.0f', 
+                 cbar = False, cmap = 'crest', annot_kws = {'fontsize':14})
 plt.ylabel('')
 plt.xlabel('')
 plt.show()
 
 # Figura 7: Scatter Plot
-temp_scatter = df[['Total Deaths', 'No Affected', 'Total Affected', 'Total Damages (\'000 US$)']]
+# temp_scatter = df[['Total Deaths', 'No Affected', 'Total Affected', 'Total Damages (\'000 US$)']]
 
-g = sns.pairplot(temp_scatter, diag_kind = 'hist', diag_kws = {'alpha':0.99, 'bins':40})
-g.fig.subplots_adjust(top = 0.95)
-g.fig.suptitle('Resumen General de las Variables Numéricas')
-g.fig.dpi = 150
-g.fig.set_size_inches(15,15)
+# g = sns.pairplot(temp_scatter, diag_kind = 'hist', diag_kws = {'alpha':0.99, 'bins':40})
+# g.fig.subplots_adjust(top = 0.95)
+# g.fig.suptitle('Resumen General de las Variables Numéricas')
+# g.fig.dpi = 150
+# g.fig.set_size_inches(15,15)
 
 #Figura 8: Grid Por Categoría
 t6 = df.groupby( ['Disaster Subgroup', 'Continent'])[['Dis No']].count().reset_index() # Conteo por Sub Tipo de Desastre
