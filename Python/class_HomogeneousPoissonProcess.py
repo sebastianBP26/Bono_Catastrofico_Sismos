@@ -133,7 +133,3 @@ class HomogeneousPoissonProcess():
         # Get the Accumulated Events vs Estimated
         self.accumulatted = get_accumulatted(self.data, self.year_max, self.mu)
         print(f'''Total de Eventos Acumulados vs Estimados: \n {self.accumulatted.iloc[-1]}''')
-        
-# pph = HomogeneousPoissonProcess()
-# pph.fit(path, mw)
-

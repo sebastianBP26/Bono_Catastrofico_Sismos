@@ -214,9 +214,9 @@ def PPH(t,tasa):
     Permite simular un Proceso De Poisson Homogéneo de parámetro Lambda a tiempo t.
     Parámetros:
         * t: Tiempo a estimar.
-        * tasa: Parámetro Lambda
+        * tasa: Estimador M.V. de Lambda = Media Muestral
     
-    Salida: Regresa un pandas DataFrame con los tiempos donde un evento ocurrió.
+    Salida: Regresa un objeto pandas DataFrame con los tiempos donde un evento ocurrió.
     
     '''
     proceso = poisson(t*tasa) # Se genera una clase de poisson con parámetro t*tasa.

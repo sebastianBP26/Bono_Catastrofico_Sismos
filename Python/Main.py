@@ -25,7 +25,7 @@ cb.hom_poisson.simulate_process()
 
 distributions = cb.hyp_test.dist_attributes
 
-params = {'simulaciones': 1000,
+params = {'simulaciones': 10,
           'maduracion': 365*4,
           'delta_pph': cb.hom_poisson.mu/360, #214/(120*360)
           'valor_facial': 1,
