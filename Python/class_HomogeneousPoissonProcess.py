@@ -13,23 +13,47 @@ import matplotlib.pyplot as plt
 
 def get_lambda(path, mw):
     
-    df = pd.read_csv(path, encoding = 'unicode_escape', engine = 'python')
-    df = df[df.Magnitud >= mw]
-    df = df[['Fecha', 'Magnitud', 'Profundidad', 'Hora']]
+    '''
+    Permite obtener el estimador para el parámetro del Proceso de Poisson Homogeneo, el cual es 
+    la media muestral:
+            Total de eventos (Mayores o iguales a la mw elegida) / total de tiempo transcurrido. 
+        path: Es la ubicación de la base del SSN limpiada.
+        mw: Magnitud mínima para filtrar los datos
+        
+    Output: 
+        lambda_m: Parámetro lambda (ms) estimado.
+        size: Total de eventos.
+        total: Rango del periodo.
+        df: Siniestros.
+    '''
+    df = pd.read_csv(path, encoding = 'unicode_escape', engine = 'python') # Leemos el csv
+    df = df[df.Magnitud >= mw] # Se filtra la base
+    df = df[['Fecha', 'Magnitud', 'Profundidad', 'Hora']] # Elegimos las columnas necesarias
     df.Fecha = pd.to_datetime(df['Fecha'].values + ' ' + df['Hora'].values, dayfirst = True)
-    df.sort_values( by = ['Fecha'], ascending = [True], inplace = True)
+    df.sort_values( by = ['Fecha'], ascending = [True], inplace = True) 
     df.drop(['Hora'], axis = 1, inplace = True)
     df['year'] = df['Fecha'].dt.year # Agregamos el anio
     
-    years = list(set(df.year.values))
-    total = int(max(years)) - int(min(years)) 
-    size = len(df)
+    years = list(set(df.year.values)) # lista de valores únicos de los años
+    total = int(max(years)) - int(min(years))  # Rango del periodo
+    size = len(df) # Total de eventos mayores o iguales a mw
     
-    lambda_m = np.round(size / total, 4)
+    lambda_m = np.round(size / total, 4) # Parámetro estimado
     
     return lambda_m, size, total, df
 
 def get_accumulatted(data, rango, mu, print_plot = True):
+    
+    '''
+    Permite realizar la gráfica del total de eventos acumulados vs total de eventos estimados
+    haciendo uso del Proceso de Poisson Homogéneo.
+        data: DataFrame con los datos filtrados.
+        rango: Hasta que periodo estaremos simulando.
+        mu: Tasa del PPH
+        
+    Output:
+        main: pandas DataFrame con los datos simulados y datos reales.
+    '''
     
     df = data
     df = df.groupby(['year'])['Magnitud'].count().reset_index()

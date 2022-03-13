@@ -13,11 +13,14 @@ from catbond_class import CatBond
 path = r'G:\Mi unidad\Tesis (Avances)\BASES\SSNMX_catalogo_19000101_20210913.csv'
 mw = 6.5
 
-severidad = pd.read_csv(r'G:\Mi unidad\Tesis (Avances)\BASES\damaged.csv', engine = 'python', encoding = 'unicode_escape')
+severidad = pd.read_csv(r'G:\Mi unidad\Tesis (Avances)\BASES\damaged.csv', 
+                        engine = 'python', encoding = 'unicode_escape')
 x = severidad.Damaged.values
                 
 cb = CatBond()
 cb.hyp_test.fit(x, {'plot_hist': True, 'bins':10})
+out_dist = cb.hyp_test.summary_ht
+att = cb.hyp_test.dist_attributes
 print(cb.hyp_test.summary_ht)
 
 cb.hom_poisson.fit(path, mw)
@@ -44,7 +47,3 @@ for distribution in cb.hyp_test.distributions_names:
     cb.interactive_surface()
     
     print(f''' Se realizó el ejercicio para la distribución: {distribution}''')
- 
-# t = []
-# t.append(tuple(params.values()))
-# t = pd.DataFrame(t, columns=list(params.keys()))

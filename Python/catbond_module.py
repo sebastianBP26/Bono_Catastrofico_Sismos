@@ -88,7 +88,10 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             dist = getattr(stats, k) # Inicializamos la distribución.
             param = dist.fit(x, floc = 0) # Ajustamos los parámetros por máxima verosimilitud.
             
-            D, p_value = stats.kstest(x, k, args = param) # D y p-value de la prueba Kolmogorov - Smirnov.
+            # D y p-value de la prueba Kolmogorov - Smirnov.
+            D, p_value = stats.kstest(x, k, args = param) 
+            # D y p-value de la prueba Cramer Von Mises.
+            cr = stats.cramervonmises(x, k, args = param)
         
             dist_results.append((k, p_value)) # Agregamos los resultados.
             
@@ -96,18 +99,23 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             test['Parametros'] = param # Parámetros
             test['D_Kolmogorov'] = D # Estadística D
             test['p_value'] = p_value # P-value.
+            test['W_Cramer'] = cr.statistic # Estadística Cramer
+            test['w_p_value'] = cr.pvalue # p-value Cramer
             
             values[k] = test # Agregamos al diccionario el diccionario "temporal" creado
-            p.append((k,D,p_value)) # Misma idea, pero con los valores de nombre de la dist, D y p-value.
+            p.append((k,D,p_value, cr.statistic, cr.pvalue)) # Misma idea, pero con los valores de nombre de la dist, D y p-value.
             
         # Obtenmos la "mejor" distribución con base en el p-value más grande.
         best_dist, best_p = (max(dist_results, key = lambda item: item[1]))
         
         # Creamos un pandas DataFrame con la lista que tiene tuplas.
         df = pd.DataFrame(p)
-        df.columns = ['distribucion','D','p_value'] # Cambiamos los nombres de las columnas
+        df.columns = ['distribucion','D','p_value', 'W', 'W_p_value'] # Cambiamos los nombres de las columnas
         df.reset_index(drop = True, inplace = True) # reset index
         df.sort_values( by = ['p_value'], ascending = [False], inplace = True) # Ordenamos descendentemente por el p-value.
+        df['d_mod'] = df['D'].values * (np.sqrt(len(x)) + 0.12 + (0.11/np.sqrt(len(x))))
+        df['w_mod'] = (df['W'].values + (0.4/len(x)) + (0.6/(len(x)**2))) * (1 + (1/ len(x)))
+        df = df.loc[:, ['distribucion', 'D', 'd_mod', 'p_value', 'W', 'w_mod', 'W_p_value']]
         
         # Inicializamos las distribuciones, aquí es donde debería agregar una nueva distribución, en caso de que lo necesite.
         
@@ -162,21 +170,6 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             plt.legend()
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
             plt.show()
-            
-            # CDF vs Distribución Teórica.
-            # cdf_function = cdf(x)
-            # rango = np.linspace(min(x), max(x), 100)
-            # Fx = dist_hist.cdf(rango)
-            # plt.figure(dpi = 150, figsize = (10,8))
-            # plt.title('Función de Distribución', fontsize = 15)
-            # plt.plot(rango,Fx, linewidth = 1, label = dist_hist.dist.name, color = colors[best_dist])
-            # plt.plot(cdf_function.x.values, cdf_function.cdf.values, drawstyle = 'steps-post', marker = 'o', 
-            #          color = '#c81025', label = 'cdf')
-            # plt.xlabel('Damaged')
-            # plt.ylabel(r'$P(X \leq x)$')
-            # plt.legend()
-            # plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-            # plt.show()
             
             cdf_function = cdf(x)
             rango = np.linspace(min(x), max(x), 100)
@@ -359,9 +352,7 @@ def price_bond(lt,zt,r,t,T,D):
     
     if len(rt) > 0:
         # Porporción de simulaciones que rebasan el umbral
-        p = sum(rt['umbral'])/len(rt) 
-        # aux = rt['umbral'].mean() # No uso aux porque si no hay siniestros (Se pasó de tiempo, sería nan)
-        # print(str(aux) + ' | ' + str(p))     
+        p = sum(rt['umbral'])/len(rt)     
     else:
         p = 0
     
@@ -370,10 +361,5 @@ def price_bond(lt,zt,r,t,T,D):
     
     # Finalmente, redondeamos el precio a 5 dígitos.
     precio = np.round(a*(1-p),5)
-    
-    # d = {} # Diccionario donde agregamos df y la proporción.
-    # d['data'] = df
-    # d['proporcion'] = p
-    # # d['aux'] = aux
     
     return precio
