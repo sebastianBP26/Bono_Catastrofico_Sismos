@@ -15,13 +15,13 @@ import seaborn as sns
     
 def cdf(x):
     
-    '''Permite obtener la función de distribución empírica para un vector x.
+    '''Permite obtener la funcion de distribucion empirica para un vector x.
     Salida: Regresa un pd DataFarme que contiene dos columnas: x | P(X <= x)'''
     
     tr = pd.DataFrame(x, columns = ['damaged']) # Construimos un dataFrame con el vector de entrada.
-    cdf = [] # List: Será llenada en el ciclo for con cada una de las probabilidades estimadas.
+    cdf = [] # List: Sera llenada en el ciclo for con cada una de las probabilidades estimadas.
     
-    a = list(set(x)) # Valores únicos del vector x.
+    a = list(set(x)) # Valores unicos del vector x.
     a.sort() # Se ordena la lista.
     
     for value in a:
@@ -37,56 +37,56 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
     '''
     La funcion hypothesis testing tiene como objetivo dar una respuesta al usuario de si sus datos
     de severidad de cierto evento aleatorio (en este caso sismos), se ajusta a alguna de las funciones
-    de distribución elegidas. Para esta función, se tienen dos parámetros:
+    de distribucion elegidas. Para esta funcion, se tienen dos parametros:
         
         1. x: Vector de observaciones del evento: Array.
-        2. distributions: Lista de distribuciones que se ajustarán, con base en la documentación de scipy. 
+        2. distributions: Lista de distribuciones que se ajustaran, con base en la documentacion de scipy. 
             Por defecto, se tienen las distribuciones lognormal, gamma, pareto y burr12.
-        3. print_hist: Parámetro booleano que nos permite indicar si queremos imprimir o no el histograma
+        3. print_hist: Parametro booleano que nos permite indicar si queremos imprimir o no el histograma
         del vector x.
-        4. bn: número de bins del histograma en caso de imprimir el histograma.
+        4. bn: numero de bins del histograma en caso de imprimir el histograma.
         
     El ajuste tiene dos faces:
         
-        1. Se ajustan los parámetros con Máxima Verosimilitud.
+        1. Se ajustan los parametros con Maxima Verosimilitud.
         2. Se aplica la prueba de Kolmogorov - Smirnov. Se pide un p-value > 0.05 para 
-        aceptar la Hipótesis Nula de que los datos siguen la distribución elegida.
-        3. Se elige la distribución mayor P-Value.
+        aceptar la Hipotesis Nula de que los datos siguen la distribucion elegida.
+        3. Se elige la distribucion mayor P-Value.
         
-    Finalmente, la función regresa los siguientes objetos:
-        1. best_dist: Nombre de la mejor distribución ajustada con base al p-value.
-        2. best_p: P-value de la mejor distribución ajustada.
-        3. values[best_dist]: Parámetros y distribución ya inicializada con los parámetros.
-        4. values: Parámetros y distribuciones ajustadas.
+    Finalmente, la funcion regresa los siguientes objetos:
+        1. best_dist: Nombre de la mejor distribucion ajustada con base al p-value.
+        2. best_p: P-value de la mejor distribucion ajustada.
+        3. values[best_dist]: Parametros y distribucion ya inicializada con los parametros.
+        4. values: Parametros y distribuciones ajustadas.
         5. df: Resumen de las pruebas realizadas |distribucion| D | P-VALUE
         6. distributions: Nombres de las distribuciones que hemos probado.
         
-        OBS: El hecho de que se seleccione una distribución haciendo uso del máximo p-value, 
-        no implica que la distribución ajusta a los datos. Para esto, solicitaríamos un p-value > 0.05
+        OBS: El hecho de que se seleccione una distribucion haciendo uso del maximo p-value, 
+        no implica que la distribucion ajusta a los datos. Para esto, solicitariamos un p-value > 0.05
         
-    Para más información sobre las distribuciones: atributos, métodos y parametrización, puede revisar las siguientes ligas:
+    Para mas informacion sobre las distribuciones: atributos, metodos y parametrizacion, puede revisar las siguientes ligas:
         gamma: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gamma.html#scipy.stats.gamma
         lognorm:https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html#scipy.stats.lognorm
         pareto: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pareto.html#scipy.stats.pareto
         burr12: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.burr12.html#scipy.stats.burr12
     
     El ajuste y las pruebas por default se realizan con la lista de distribuciones que viene en los
-    parámetros de la función. Si desea agregar una nueva distribución (o una nueva lista), deberá
-    agregar los parámetros de las mismas como se muestra al final de la función, para poder obtener
-    los parámetros. 
+    parametros de la funcion. Si desea agregar una nueva distribucion (o una nueva lista), debera
+    agregar los parametros de las mismas como se muestra al final de la funcion, para poder obtener
+    los parametros. 
     
     '''
     try:
             
-        values = {} # Dic: Tendrá parámetros y distribuciones
-        dist_results = [] # List: Será llenado con tuplas para crear un dataframe
-        p = [] # List: Metricas Calculadas para cada distribución.
+        values = {} # Dic: Tendra parametros y distribuciones
+        dist_results = [] # List: Sera llenado con tuplas para crear un dataframe
+        p = [] # List: Metricas Calculadas para cada distribucion.
         
-        # El ciclo for nos permite realizar el ajuste de parámetros y la prueba para cada distribución.
+        # El ciclo for nos permite realizar el ajuste de parametros y la prueba para cada distribucion.
         for k in distributions:
             
-            dist = getattr(stats, k) # Inicializamos la distribución.
-            param = dist.fit(x, floc = 0) # Ajustamos los parámetros por máxima verosimilitud.
+            dist = getattr(stats, k) # Inicializamos la distribucion.
+            param = dist.fit(x) # Ajustamos los parametros por maxima verosimilitud.
             
             # D y p-value de la prueba Kolmogorov - Smirnov.
             D, p_value = stats.kstest(x, k, args = param) 
@@ -95,17 +95,17 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
         
             dist_results.append((k, p_value)) # Agregamos los resultados.
             
-            test = {} # Llenaremos este diccionario temporal con los parámetros, estadística y p-value.
-            test['Parametros'] = param # Parámetros
-            test['D_Kolmogorov'] = D # Estadística D
+            test = {} # Llenaremos este diccionario temporal con los parametros, estadistica y p-value.
+            test['Parametros'] = param # Parametros
+            test['D_Kolmogorov'] = D # Estadistica D
             test['p_value'] = p_value # P-value.
-            test['W_Cramer'] = cr.statistic # Estadística Cramer
+            test['W_Cramer'] = cr.statistic # Estadistica Cramer
             test['w_p_value'] = cr.pvalue # p-value Cramer
             
             values[k] = test # Agregamos al diccionario el diccionario "temporal" creado
             p.append((k,D,p_value, cr.statistic, cr.pvalue)) # Misma idea, pero con los valores de nombre de la dist, D y p-value.
             
-        # Obtenmos la "mejor" distribución con base en el p-value más grande.
+        # Obtenmos la "mejor" distribucion con base en el p-value mas grande.
         best_dist, best_p = (max(dist_results, key = lambda item: item[1]))
         
         # Creamos un pandas DataFrame con la lista que tiene tuplas.
@@ -117,55 +117,57 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
         df['w_mod'] = (df['W'].values + (0.4/len(x)) + (0.6/(len(x)**2))) * (1 + (1/ len(x)))
         df = df.loc[:, ['distribucion', 'D', 'd_mod', 'p_value', 'W', 'w_mod', 'W_p_value']]
         
-        # Inicializamos las distribuciones, aquí es donde debería agregar una nueva distribución, en caso de que lo necesite.
+        # Inicializamos las distribuciones, aqui es donde deberia agregar una nueva distribucion, en caso de que lo necesite.
         
         lognorm_p = values['lognorm']['Parametros'] 
         gamma_p = values['gamma']['Parametros']
         pareto_p = values['pareto']['Parametros']
         burr_p = values['burr12']['Parametros']
         
-        # Indicamos los parámetros de la distribución, parámetros ajustados previamente.
+        # Indicamos los parametros de la distribucion, parametros ajustados previamente.
         values['lognorm']['model'] = stats.lognorm(s = lognorm_p[0], loc = lognorm_p[1], scale = lognorm_p[2])
         values['gamma']['model'] = stats.gamma(a = gamma_p[0], loc = gamma_p[1], scale = gamma_p[2])
         values['pareto']['model'] = stats.pareto(b = pareto_p[0], loc = pareto_p[1], scale = pareto_p[2])
         values['burr12']['model'] = stats.burr12(c = burr_p[0], d = burr_p[1], loc = burr_p[2], scale = burr_p[3])
         
-        # Imprimimos en consola la mejor distribución y su correspondiente p-value. 
-        print(f'''La mejor distribución para sus datos es: {best_dist} con un P-value de {np.round(best_p,4)}.''')
+        # Imprimimos en consola la mejor distribucion y su correspondiente p-value. 
+        print(f'''La mejor distribucion para sus datos es: {best_dist} con un P-value de {np.round(best_p,4)}.''')
         
         if print_hist:
             
-            # st: string que nos permite agregar los títulos a los gráficos.
+            # st: string que nos permite agregar los titulos a los graficos.
             st = 'Best Distribution : ' + str(best_dist) + '. P-value: ' + str(np.round(best_p,4))
             
-            # colors: diccionario con los colores para cada distribución.
+            # colors: diccionario con los colores para cada distribucion.
             colors = {'lognorm': '#273746', 'gamma':'#432746', 'pareto':'#17a589', 'burr12':'#581845'}
             linestyles = {'lognorm': 'solid', 'gamma':'dashed', 'pareto':'dashdot', 'burr12':'dotted'}
 
             # Histrograma del vector x (sin fx(X))
             xt = np.linspace(min(x), max(x), 10)
             plt.figure(dpi = 150, figsize = (10,8))
-            plt.title('Histogram' + '\n' + st, fontsize = 12)
+            plt.title('Histogram' + '\n' + st, fontsize = 15)
             sns.histplot(data = pd.DataFrame(x, columns = ['Siniestros']), x = 'Siniestros', color = '#c81025',
-                          bins = bn, stat = 'density', label = 'Siniestros')
+                          bins = bn, stat = 'density', label = 'Damaged')
             plt.ylabel('Probabilidad')
+            plt.xlabel('Damaged')
             plt.xticks(xt)
             plt.legend()
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
             plt.show()
             
-            # Histograma de x y la mejor distribución.
+            # Histograma de x y la mejor distribucion.
             xt = np.linspace(min(x), max(x), 10)
             plt.figure(dpi = 150, figsize = (10,8))
-            plt.title('Histogram' + '\n' + st, fontsize = 12)
+            plt.title('Histogram' + '\n' + st, fontsize = 15)
             sns.histplot(data = pd.DataFrame(x, columns = ['Siniestros']), x = 'Siniestros', color = '#c81025',
-                          bins = bn, stat = 'density', label = 'Siniestros')
+                          bins = bn, stat = 'density', label = 'Damaged')
             
             dist_hist = values[best_dist]['model']
             rango = np.linspace(min(x), max(x), 100)
             fx = dist_hist.pdf(rango)
             plt.plot(rango,fx, linewidth = 2, label = dist_hist.dist.name, color = colors[best_dist])
             plt.ylabel('Probabilidad')
+            plt.xlabel('Damaged')
             plt.xticks(xt)
             plt.legend()
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
@@ -174,7 +176,7 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             cdf_function = cdf(x)
             rango = np.linspace(min(x), max(x), 100)
             plt.figure(dpi = 150, figsize = (10,8))
-            plt.title('Funciones de Distribución vs Función De Distribución Empírica', fontsize = 14)
+            plt.title('Funciones de Distribucion vs Funcion De Distribucion Empirica', fontsize = 14)
             for dist in distributions:
                 dist_hist = values[dist]['model']
                 Fx = dist_hist.cdf(rango)
@@ -198,25 +200,25 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
     
     except TypeError:
         
-        print('Por favor, agregue un valor numérico.')    
+        print('Por favor, agregue un valor numerico.')    
         
 
 def PPH(t,tasa):
     
     '''
-    Permite simular un Proceso De Poisson Homogéneo de parámetro Lambda a tiempo t.
-    Parámetros:
+    Permite simular un Proceso De Poisson Homogeneo de parametro Lambda a tiempo t.
+    Parametros:
         * t: Tiempo a estimar.
         * tasa: Estimador M.V. de Lambda = Media Muestral
     
-    Salida: Regresa un objeto pandas DataFrame con los tiempos donde un evento ocurrió.
+    Salida: Regresa un objeto pandas DataFrame con los tiempos donde un evento ocurrio.
     
     '''
-    proceso = poisson(t*tasa) # Se genera una clase de poisson con parámetro t*tasa.
+    proceso = poisson(t*tasa) # Se genera una clase de poisson con parametro t*tasa.
     u = uniform(loc = 0, scale = t) # Se genera una clase de uniform de 0 a t.
-    xt = proceso.rvs() # Generamos un número aleatorio de la distribución Poisson.
-    t = np.sort(np.round(u.rvs(xt))) # Redondeamos los valores de las v.a. Unif para tener num de días enteros.
-    # t = np.sort(u.rvs(xt)) # Se generan xt números aleatorios de la dist uniforme y se ordenan.
+    xt = proceso.rvs() # Generamos un numero aleatorio de la distribucion Poisson.
+    t = np.sort(np.round(u.rvs(xt))) # Redondeamos los valores de las v.a. Unif para tener num de dias enteros.
+    # t = np.sort(u.rvs(xt)) # Se generan xt numeros aleatorios de la dist uniforme y se ordenan.
     t = t.tolist() # Cambiamos el tipo de dato de t a lista.
     t.insert(0,0) # Agregamos un 0 al inicio de t (No = 0).
     seq = list(range(0,xt)) # Hacemos un rango de valores de 0 a xt.
@@ -227,25 +229,25 @@ def PPH(t,tasa):
 
 def generate_process(n, T, m, dist, umbral = [0.8], plot = False,  dpi = 150, figsize = (10,8)):
     
-    ''' Función para generar las simulaciones del Lt. 
+    ''' Funcion para generar las simulaciones del Lt. 
     
-    El objetivo de esta función es el obtener un objeto pandas dataframe en donde se almacenen todas 
-    las simulaciones de tiempo 0 hasta T, de el número de sismos usando un PPH(Lambda). 
+    El objetivo de esta funcion es el obtener un objeto pandas dataframe en donde se almacenen todas 
+    las simulaciones de tiempo 0 hasta T, de el numero de sismos usando un PPH(Lambda). 
     
-    Recordando que Lt es la suma de los daños provocados hasta Nt.
+    Recordando que Lt es la suma de los danios provocados hasta Nt.
     
-    Para esto, la función tiene 5 Parámetros:
+    Para esto, la funcion tiene 5 Parametros:
         
-        1. n: Número de caminatas aleatorias que se generan.
-        2. T: Temporalidad máxima (tiempo de maduración del CatBond). 
-        3. m: Tasa del Proceso de Poisson Homogéneo. 
-        4.dist: Función de Distribución elegida.
-        5. plot: Permite imprimir la gráfica de las caminatas aleatorias, por default es False. 
-                 Esto debido a que entre mayor sea n, mayor el tiempo que toma en imprimir la gráfica.
-        6. umbral: Nivel de Threshold, por default se utiliza el quantil 0.8 de la distribución elegida.
+        1. n: Numero de caminatas aleatorias que se generan.
+        2. T: Temporalidad maxima (tiempo de maduracion del CatBond). 
+        3. m: Tasa del Proceso de Poisson Homogeneo. 
+        4.dist: Funcion de Distribucion elegida.
+        5. plot: Permite imprimir la grafica de las caminatas aleatorias, por default es False. 
+                 Esto debido a que entre mayor sea n, mayor el tiempo que toma en imprimir la grafica.
+        6. umbral: Nivel de Threshold, por default se utiliza el quantil 0.8 de la distribucion elegida.
       
-     Output: La función regresa un objeto DataFrame, donde se almacenan cada una de las simulaciones
-     generadas, además les genera una etiqueta para poder diferenciarlas. 
+     Output: La funcion regresa un objeto DataFrame, donde se almacenan cada una de las simulaciones
+     generadas, ademas les genera una etiqueta para poder diferenciarlas. 
      
      '''    
     simulaciones = {} # Diccionario donde almacenaremos los datos
@@ -253,47 +255,47 @@ def generate_process(n, T, m, dist, umbral = [0.8], plot = False,  dpi = 150, fi
     
     for i in range(n):
         
-        # Se genera una caminata aleatoria del PPH(Lambda) para simular el número de sismos 
-        # En cada iteración se estima el número de sismos entre tiempo [0,T]
-        # Se le da como parámetros la temporalidad T y la lambda (ms) del proceso.
+        # Se genera una caminata aleatoria del PPH(Lambda) para simular el numero de sismos 
+        # En cada iteracion se estima el numero de sismos entre tiempo [0,T]
+        # Se le da como parametros la temporalidad T y la lambda (ms) del proceso.
         
-        pph = PPH(T, m) # Se genera una caminata aleatoria del PPH de parámetro m a tiempo T.
+        pph = PPH(T, m) # Se genera una caminata aleatoria del PPH de parametro m a tiempo T.
         
         # Dado que el proceso inicia en cero, se elimina un elemento de la longitud del DataFrame
         num = len(pph) - 1 
         
-        # Se obtiene el Proceso de pérdidas agregado sumando las Xi simuladas.
-        # Simulamos num (Que es el número de eventos que se estiman) v.a de la Fx(X) elegida
-        # haciendo uso del método .rvs(num) de la distribución elegida.
+        # Se obtiene el Proceso de perdidas agregado sumando las Xi simuladas.
+        # Simulamos num (Que es el numero de eventos que se estiman) v.a de la Fx(X) elegida
+        # haciendo uso del metodo .rvs(num) de la distribucion elegida.
         
         damaged = list(dist.rvs(num)) # random_state = 42 si queremos fijar
         damaged.insert(0,0) # Se agrega un 0 al inicio porque comienza en 0 el PPH
         
         # El DataFrame t va acumulando a D
         t = pd.DataFrame( {'pph':pph.Value.values, 'damaged':np.cumsum(damaged)})
-        # Agregamos una etiqueta para saber qué caminata aleatoria representa.
+        # Agregamos una etiqueta para saber que caminata aleatoria representa.
         t['tipo'] = 'data_' + str(i)
         
-        # Se agrega la simulación i en el diccionario simulaciones.
+        # Se agrega la simulacion i en el diccionario simulaciones.
         simulaciones[i] = t
         
-        # Concatenamos el DF concat (que inició vacío) con cada simulación que vamos generando.
+        # Concatenamos el DF concat (que inicio vacio) con cada simulacion que vamos generando.
         concat = pd.concat([concat,t])
         
-    # Si el usuario desea ver la gráfica de todas las caminatas aleatorias
+    # Si el usuario desea ver la grafica de todas las caminatas aleatorias
     if plot:
         
-        # Generamos las paletas de colores 1 para cada simulación.
+        # Generamos las paletas de colores 1 para cada simulacion.
         colors = np.random.rand(len(simulaciones),3) 
         
-        # Se calcula el umbral (D), éste puede se un array o un escalar.
+        # Se calcula el umbral (D), este puede se un array o un escalar.
         umbral_test = dist.ppf(umbral)
         
         # Generamos la figura
         plt.figure(dpi = dpi, figsize = figsize)
         
-        # Agregamos el título al gráfico
-        plt.title('Proceso de Pérdidas Agregadas $L_{t} = \sum_{i = 1}^{M_{t}} X_{i}$', fontsize = 16)
+        # Agregamos el titulo al grafico
+        plt.title('Proceso de Perdidas Agregadas $L_{t} = \sum_{i = 1}^{M_{t}} X_{i}$', fontsize = 16)
         
         # Ciclo for para graficar cada una de las caminatas generadas.
         for key in simulaciones.keys():
@@ -305,8 +307,8 @@ def generate_process(n, T, m, dist, umbral = [0.8], plot = False,  dpi = 150, fi
         for u in umbral_test: 
             plt.axhline(y = u, color = '#000000', linestyle = '-')
         
-        # Etiquetas de los ejes, grid y mostramos el gráfico.            
-        plt.xlabel('Días')
+        # Etiquetas de los ejes, grid y mostramos el grafico.            
+        plt.xlabel('Dias')
         plt.ylabel(r'$L_{t}$')
         plt.grid()
         plt.show()
@@ -316,14 +318,14 @@ def generate_process(n, T, m, dist, umbral = [0.8], plot = False,  dpi = 150, fi
 def price_bond(lt,zt,r,t,T,D):
     
     '''
-    Esta función calcula el precio del CatBond. Los parámetros que se solicitan son:
+    Esta funcion calcula el precio del CatBond. Los parametros que se solicitan son:
         
-        lt: DataFrame que contiene el proceso de Pérdida agregada. Idealmente, este objeto
-        es el que generamos con la función 'generate_process'.
+        lt: DataFrame que contiene el proceso de Perdida agregada. Idealmente, este objeto
+        es el que generamos con la funcion 'generate_process'.
         zt: Valor Facial del bono.
-        r: Tasa de interés / descuento.
+        r: Tasa de interes / descuento.
         t: Tiempo al que queremos valuar el precio del bono.
-        T: Tiempo de maduración del bono.
+        T: Tiempo de maduracion del bono.
         D: Umbral.
         
         Salida: Regresa el precio del bono (float)
@@ -332,34 +334,34 @@ def price_bond(lt,zt,r,t,T,D):
     
     df = pd.DataFrame()
     df['pph'] = lt['pph'].values # Tiempos donde ocurren los eventos
-    df['damaged'] = lt['damaged'].values # Pérdidas agregadas
+    df['damaged'] = lt['damaged'].values # Perdidas agregadas
     df['tipo'] = lt['tipo'].values # Etiqueta de la caminata aleatoria
     
-    # Haciendo uso del valor D, verificamos para cada caminta cuál ha sobrepasado el valor de D.
+    # Haciendo uso del valor D, verificamos para cada caminta cual ha sobrepasado el valor de D.
     # Para aquellos que hayan rebasado, se les asigna el valor 1 y si no tienen un valor 0.
     df['umbral'] = (df.damaged > D).astype('int32') 
     
     # Filtramos el dataframe con base en el tiempo t, que es donde queremos valuar el precio del bono.
     df = df[df.pph >= t]
     
-    # rt es la agrupación por caminata aleatoria, donde calculamos el máximo de la columna 'umbral'.
-    # Previamente creada, por construcción, una caminata aleatoria puede tener múltiples "unos", pero
-    # al caclular el máximo podemos saber si en esa caminata se sobrepaso o no a D.
+    # rt es la agrupacion por caminata aleatoria, donde calculamos el maximo de la columna 'umbral'.
+    # Previamente creada, por construccion, una caminata aleatoria puede tener multiples "unos", pero
+    # al caclular el maximo podemos saber si en esa caminata se sobrepaso o no a D.
     rt = df.groupby(['tipo'])['umbral'].max().reset_index() 
     
-    # Verificamos que haya al menos una simulación para calcular la proporción:
-    # Número de simulaciones que rebasaron el umbral / total de simulaciones.
+    # Verificamos que haya al menos una simulacion para calcular la proporcion:
+    # Numero de simulaciones que rebasaron el umbral / total de simulaciones.
     
     if len(rt) > 0:
-        # Porporción de simulaciones que rebasan el umbral
+        # Porporcion de simulaciones que rebasan el umbral
         p = sum(rt['umbral'])/len(rt)     
     else:
         p = 0
     
-    # Calculamos el precio del bono, que es el valor presente multiplicado por 1 - proporción.
+    # Calculamos el precio del bono, que es el valor presente multiplicado por 1 - proporcion.
     a = np.exp(-r*(T-t)/360)*zt
     
-    # Finalmente, redondeamos el precio a 5 dígitos.
+    # Finalmente, redondeamos el precio a 5 digitos.
     precio = np.round(a*(1-p),5)
     
     return precio

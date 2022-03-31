@@ -14,18 +14,19 @@ import matplotlib.pyplot as plt
 def get_lambda(path, mw):
     
     '''
-    Permite obtener el estimador para el parámetro del Proceso de Poisson Homogeneo, el cual es 
+    Permite obtener el estimador para el parametro del Proceso de Poisson Homogeneo, el cual es 
     la media muestral:
             Total de eventos (Mayores o iguales a la mw elegida) / total de tiempo transcurrido. 
-        path: Es la ubicación de la base del SSN limpiada.
-        mw: Magnitud mínima para filtrar los datos
+        path: Es la ubicacion de la base del SSN limpiada.
+        mw: Magnitud minima para filtrar los datos
         
     Output: 
-        lambda_m: Parámetro lambda (ms) estimado.
+        lambda_m: Parametro lambda (ms) estimado.
         size: Total de eventos.
         total: Rango del periodo.
         df: Siniestros.
     '''
+    
     df = pd.read_csv(path, encoding = 'unicode_escape', engine = 'python') # Leemos el csv
     df = df[df.Magnitud >= mw] # Se filtra la base
     df = df[['Fecha', 'Magnitud', 'Profundidad', 'Hora']] # Elegimos las columnas necesarias
@@ -34,19 +35,19 @@ def get_lambda(path, mw):
     df.drop(['Hora'], axis = 1, inplace = True)
     df['year'] = df['Fecha'].dt.year # Agregamos el anio
     
-    years = list(set(df.year.values)) # lista de valores únicos de los años
+    years = list(set(df.year.values)) # lista de valores unicos de los anios
     total = int(max(years)) - int(min(years))  # Rango del periodo
     size = len(df) # Total de eventos mayores o iguales a mw
     
-    lambda_m = np.round(size / total, 4) # Parámetro estimado
+    lambda_m = np.round(size / total, 4) # Parametro estimado
     
     return lambda_m, size, total, df
 
 def get_accumulatted(data, rango, mu, print_plot = True):
     
     '''
-    Permite realizar la gráfica del total de eventos acumulados vs total de eventos estimados
-    haciendo uso del Proceso de Poisson Homogéneo.
+    Permite realizar la grafica del total de eventos acumulados vs total de eventos estimados
+    haciendo uso del Proceso de Poisson Homogeneo.
         data: DataFrame con los datos filtrados.
         rango: Hasta que periodo estaremos simulando.
         mu: Tasa del PPH
@@ -80,7 +81,7 @@ def get_accumulatted(data, rango, mu, print_plot = True):
     # Agregar las etiquetas
     clr = {'real': '#2eb094', 'estimado': '#b02e61'}
     plt.figure(dpi = 150, figsize = (10,8))
-    plt.title('Eventos Acumulados vs Eventos Estimados', fontsize = 12)
+    plt.title('Eventos Acumulados vs Eventos Estimados | ms = ' + str(np.round(mu,4)), fontsize = 15)
     
     for col in list(main.columns[1:]):    
         plt.plot(main.tiempo.values,main[col].values, linewidth = 2, label = col, color = clr[col])
@@ -117,13 +118,13 @@ class HomogeneousPoissonProcess():
         self.data = path
         self.magnitud = mw
         
-        # Obtenemos el parámetro lambda y el total de sismos para esa lambda
+        # Obtenemos el parametro lambda y el total de sismos para esa lambda
         self.mu, self.size, self.year_max, self.data = get_lambda(self.data,self.magnitud)
                 
         # Creamos el modelo, el cual utiliza la clase stats.poisson
         self.model = poisson(self.mu)
         
-        # Medidas estadísticas: Media, Varianza, Kurtosis y Skweness
+        # Medidas estadisticas: Media, Varianza, Kurtosis y Skweness
         self.mean, self.var, self.skew, self.kurtosis = self.model.stats('mvks')
         
         # Redondeamos los valores
@@ -131,7 +132,7 @@ class HomogeneousPoissonProcess():
         self.var = round(float(self.var), self.nbr_rnd)
         self.skew = round(float(self.skew), self.nbr_rnd)
         self.kurtosis = round(float(self.kurtosis), self.nbr_rnd)
-        self.desv = round(np.sqrt(float(self.var)), self.nbr_rnd) #Desviación estándar
+        self.desv = round(np.sqrt(float(self.var)), self.nbr_rnd) #Desviacion estandar
         
         # Calculo de probabilidades
         probabilities = []
@@ -142,7 +143,7 @@ class HomogeneousPoissonProcess():
         for w in values:
             probabilities.append(round(self.model.pmf(w),4))
             cum_p.append(round(self.model.cdf(w),4))
-            sup_p.append(round(1-self.model.cdf(w),4))
+            sup_p.append(round(self.model.sf(w),4))
         
         # Asignamos los valores en un Data Frame de Pandas.
         self.summary['x'] = values

@@ -26,47 +26,47 @@ class CatBond():
     def __init__(self):
         
         '''
-        La clase tiene como objetivo poder realizar el análisis del precio del bono (CatBond) para
-        sismos en México de una manera "directa". Concretamente, nos referimos a que si se cuenta con una
+        La clase tiene como objetivo poder realizar el analisis del precio del bono (CatBond) para
+        sismos en Mexico de una manera "directa". Concretamente, nos referimos a que si se cuenta con una
         base (archivo csv o vector) con los datos de la severidad y de la frecuencia (Se supone la base del SSN)
-        se pueda realizar la valuación del bono con la metodología elegida. 
+        se pueda realizar la valuacion del bono con la metodologia elegida. 
         
-        Para esto, la clase CatBond tendrá diversos atributos para hacer referencia a aquellos que
-        afectan al precio del bono (Distribución, tiempo de maduración, tasa, etc.). Sin embargo,
-        tendrá dos atributos que a su vez son dos clases y que nos permitirán ajustar las distribuciones elegidas
+        Para esto, la clase CatBond tendra diversos atributos para hacer referencia a aquellos que
+        afectan al precio del bono (Distribucion, tiempo de maduracion, tasa, etc.). Sin embargo,
+        tendra dos atributos que a su vez son dos clases y que nos permitiran ajustar las distribuciones elegidas
         ('lognorm', 'gamma', 'pareto', 'burr12') para la Severidad y ajustar el PPH(m) para la severidad. 
         
-            HypothesisTesting: La clase permite realizar la prueba Kolmogorov  - Smirnov para las distribuciones
+            HypothesisTesting: La clase permite realizar la prueba Kolmogorov-Smirnov y Cramer para las distribuciones
                                mencionadas. 
                                
-            HomogeneousPoissonProcess: Permite estimar la lambda del proceso de Poisson Homogéneo con la información
-                                      proporcionada por el Servicio Sismológico Nacional (SSN).
+            HomogeneousPoissonProcess: Permite estimar la lambda del proceso de Poisson Homogeneo con la informacion
+                                      proporcionada por el Servicio Sismologico Nacional (SSN).
                                       
-            Para más información acerca de los atributos y métodos de estas dos clases, favor de acceder a su archivo,
+            Para mas informacion acerca de los atributos y metodos de estas dos clases, favor de acceder a su archivo,
             donde se encuentran comentados.
             
-        Una vez que contamos con la distribución y la tasa del proceso de Poisson, se podrán usar estos atributos como
-        parámetros del método get_price() o get_sheet() para calcular los precios del bono.
+        Una vez que contamos con la distribucion y la tasa del proceso de Poisson, se podran usar estos atributos como
+        parametros del metodo get_price() o get_sheet() para calcular los precios del bono.
         
-        * Cuando se llame a los métodos para obtener precios, solicitarán un diccionario con los parámetros del precio del bono,
+        * Cuando se llame a los metodos para obtener precios, solicitaran un diccionario con los parametros del precio del bono,
         los cuales son:
-            n: Número de simulaciones (caminatas aleatorias) de Lt.
-            maturity_time: Tiempo de maduración del bono.
+            n: Numero de simulaciones (caminatas aleatorias) de Lt.
+            maturity_time: Tiempo de maduracion del bono.
             delt_pph: Delta del PPH().
             face_value: Valor facial del Bono.
-            rate: Tasa de interés/descuento del bono.
-            *umbral: Treshold.
-            *tiempo: Tiempo al cual se valúa el precio del bono.
-            plot: Boolean que permite imprimir la gráfica de las caminatas aleatorias.
+            rate: Tasa de interes/descuento del bono.
+            *umbral: threshold.
+            *tiempo: Tiempo al cual se valua el precio del bono.
+            plot: Boolean que permite imprimir la grafica de las caminatas aleatorias.
             print_sheet: Boolean que permite imprimir la surface de los precios.
             
-        Los campos marcados con * solo son para el método get_price() pues es para un solo valor y se debe especificar
+        Los campos marcados con * solo son para el metodo get_price() pues es para un solo valor y se debe especificar
         el threshold y el tiempo.
         
         Observaciones:
-            Por como está construida la clase, no es necesario ejecutar self.hom_poisson.fit(), ya que podemos asignar
+            Por como esta construida la clase, no es necesario ejecutar self.hom_poisson.fit(), ya que podemos asignar
             "manualmente" la tasa, es decir, la clase se encarga de estimar lambda, pero si deseara valuar con otra lambda,
-            se podría asignar este valor al atributo de la clase.
+            se podria asignar este valor al atributo de la clase.
         
         '''
         # Atributos de la clase.
@@ -77,21 +77,21 @@ class CatBond():
         # Variables de entrada para inicializar la clase: Datos de la frecuencia.
         self.hom_poisson = HomogeneousPoissonProcess() # Para mayor detalle de la clase, ir al archivo.
         
-        # Atributos: Método  get_price: para calcular el precio del bono a tiempo t.
-        self.n = 0 # int: Número de simulaciones a realizar.
+        # Atributos: Metodo  get_price: para calcular el precio del bono a tiempo t.
+        self.n = 0 # int: Numero de simulaciones a realizar.
         self.Lt = pd.DataFrame() # Lt: Aggregated Process
-        self.maturity_time = 0 # int: Tiempo de Maduración.
+        self.maturity_time = 0 # int: Tiempo de Maduracion.
         self.face_value = 0.0 # Float: Valor Faciald del Bono
         self.rate = 0.0 # Float: Tasa del Proceso de Poisson.
         self.umbral = 0.0 # Float: Umbral (Threshold)
         self.price = 0.0 # Float: Precio del Bono.
         
-        # Atributos del método get_sheet: Permite calcular el precio del bono para todo t y D.
-        self.time_range = [] # Lista que tiene los tiempos en los que haremos la simulación (partición del intervalo).
-        self.umbrales = [] # Lista que tiene los umbrales en los que haremos la simulación (partición del intervalo).
-        self.sheet = pd.DataFrame() # pd.DF que tendrá los precios del bono para cada tiempo y umbral.
-        self.time_spend = 0.0 # Variable que nos indicará el tiempo en segundos que tardó el proceso en encontrar los precios.
-        self.print_sheet = False # Bool: Permite imprimir la sábana de precios (Estática).
+        # Atributos del metodo get_sheet: Permite calcular el precio del bono para todo t y D.
+        self.time_range = [] # Lista que tiene los tiempos en los que haremos la simulacion (particion del intervalo).
+        self.umbrales = [] # Lista que tiene los umbrales en los que haremos la simulacion (particion del intervalo).
+        self.sheet = pd.DataFrame() # pd.DF que tendra los precios del bono para cada tiempo y umbral.
+        self.time_spend = 0.0 # Variable que nos indicara el tiempo en segundos que tardo el proceso en encontrar los precios.
+        self.print_sheet = False # Bool: Permite imprimir la sabana de precios (Estatica).
         
 
     def get_price(self, params):
@@ -119,7 +119,7 @@ class CatBond():
         self.face_value = params['valor_facial']
         self.rate = params['tasa']
            
-        self.time_range = list(range(0,params['maduracion'],5)) # Saltos de tiempos en días  
+        self.time_range = list(range(0,params['maduracion'],5)) # Saltos de tiempos en dias  
         self.umbrales = list(np.linspace(self.hyp_test.dist.ppf(0.7), self.hyp_test.dist.ppf(0.99), 30))
         
         ''' INICIO DEL PROCESO '''
@@ -166,16 +166,16 @@ class CatBond():
             ax.set_xlabel('Tiempo')
             ax.set_ylabel('Umbral')
             ax.set_zlabel('Precio')
-            ax.set_title(f''' Sábana de precios CatBond: 
-                         Duración Proceso: {str(round(self.time_spend/60,2))} | $F(x)$: {self.hyp_test.dist.dist.name.capitalize()} | T: {str(self.maturity_time)} | Simulaciones: {str(self.n)} | $\delta$: {str(round(self.delta_pph,5))}''')
+            ax.set_title(f''' Sabana de precios CatBond: 
+                         Duracion Proceso: {str(round(self.time_spend/60,2))} | $F(x)$: {self.hyp_test.dist.dist.name.capitalize()} | T: {str(self.maturity_time)} | Simulaciones: {str(self.n)} | $\delta$: {str(round(self.delta_pph,5))}''')
                          
             
     def interactive_surface(self):
         
-        pio.renderers.default = 'browser' # Se elige esta opción para poder imprimir la gráfica interactiva en el navegador web
+        pio.renderers.default = 'browser' # Se elige esta opcion para poder imprimir la grafica interactiva en el navegador web
         
         fig = go.Figure(data = [go.Surface(z = self.sheet.values)])
-        text_title = f'''F(x): {self.hyp_test.dist.dist.name.capitalize()} | T: {str(self.maturity_time)} | Simulaciones: {str(self.n)} | ð: {str(round(self.delta_pph,5))}'''
+        text_title = f'''F(x): {self.hyp_test.dist.dist.name.capitalize()} | T: {str(self.maturity_time)} | Simulaciones: {str(self.n)} | mu: {str(round(self.delta_pph,5))}'''
         title = {'text': text_title}
         
         fig.update_layout(title = title, autosize=False, width = 800, height = 750,
