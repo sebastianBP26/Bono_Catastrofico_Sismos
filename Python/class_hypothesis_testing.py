@@ -5,8 +5,11 @@ Created on Tue Feb  8 21:52:34 2022
 @author: Sebastian Barroso
 """
 
+# Modulos
+# Pre - instalacion
 import pandas as pd
 import numpy as np
+# Propios
 import catbond_module as cm
 
 class HypothesisTesting():

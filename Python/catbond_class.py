@@ -8,15 +8,13 @@ Created on Wed Feb  9 22:30:20 2022
 
 # MODULOS 
 import time # Modulos de Python
-
 # Pre-instalacion
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.io as pio
-
-# Modulo tesis
+# Propios
 import catbond_module as cm
 from class_hypothesis_testing import HypothesisTesting
 from class_HomogeneousPoissonProcess import HomogeneousPoissonProcess
@@ -79,7 +77,7 @@ class CatBond():
         
         # Atributos: Metodo  get_price: para calcular el precio del bono a tiempo t.
         self.n = 0 # int: Numero de simulaciones a realizar.
-        self.Lt = pd.DataFrame() # Lt: Aggregated Process
+        self.Lt = pd.DataFrame() # Lt: Proceso de Perdida Agregado
         self.maturity_time = 0 # int: Tiempo de Maduracion.
         self.face_value = 0.0 # Float: Valor Faciald del Bono
         self.rate = 0.0 # Float: Tasa del Proceso de Poisson.
@@ -120,7 +118,7 @@ class CatBond():
         self.rate = params['tasa']
            
         self.time_range = list(range(0,params['maduracion'],5)) # Saltos de tiempos en dias  
-        self.umbrales = list(np.linspace(self.hyp_test.dist.ppf(0.7), self.hyp_test.dist.ppf(0.99), 30))
+        self.umbrales = list(np.linspace(self.hyp_test.dist.ppf(0.7), self.hyp_test.dist.ppf(0.9), 30))
         
         ''' INICIO DEL PROCESO '''
 

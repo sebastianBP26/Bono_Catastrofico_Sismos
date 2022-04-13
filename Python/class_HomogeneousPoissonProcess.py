@@ -97,12 +97,12 @@ class HomogeneousPoissonProcess():
     
     def __init__(self):
         
-        self.data = None # SSN Database which will be filter with the events.
-        self.magnitud = None # Float: Value to be filter (at least >=)
-        self.mu = 0.0 # Float: PPH Lambda Estimated
-        self.size = 0.0 # Int: Total events
+        self.data = None # Base de datos del SSN
+        self.magnitud = None # Float: Valores a ser filtrados (>=)
+        self.mu = 0.0 # Float: Tasa del proceso de Poisson que estimaremos
+        self.size = 0.0 # Int: Total de eventos
         self.year_max = 0.0
-        self.model = 0.0 # scipy.poisson: Poisson Distribution Model
+        self.model = 0.0 # scipy.poisson: Instancia de la clase Poisson de Scipy
         self.mean = 0.0 # Media del modelo Poisson
         self.var = 0.0 # Varianza del modelo Poisson
         self.skew = 0.0 # Skewness del modelo Poisson

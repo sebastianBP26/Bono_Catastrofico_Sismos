@@ -5,7 +5,8 @@ Created on Tue Dec 14 21:04:42 2021
 @author: Sebastian Barroso
 """
 
-# Modules
+# Modulos
+# Pre -instalacion
 from scipy import stats
 import pandas as pd
 from scipy.stats import poisson, uniform
