@@ -75,6 +75,13 @@ plt.show()
 # También se remueve el evento de subgrupo 'extra terrestrial' ya que solo hay un evento.
 df = df[(df.Year >= 1970) & (~df['Disaster Subgroup'].isin(['Extra-terrestrial']))]
 
+# Descripciones generales
+cc = df.loc[:, ['Year', 'Total Deaths', 'Total Affected', 'Total Damages (\'000 US$)']].describe()
+cc.columns = cc.columns.str.replace(' ', '_').str.upper()
+cc['TOTAL_AFFECTED'] = cc['TOTAL_AFFECTED'].astype('int64')
+cc["TOTAL_DAMAGES_(\'000_US$)"] = cc["TOTAL_DAMAGES_(\'000_US$)"].astype('int64')
+cc.columns = ['AÑOS', 'TOTAL DE MUERTES', ' TOTAL DE AFECTADOS', ' TOTAL DE DAÑO']
+
 var = df.describe()
 con_count = df.groupby(['Continent'])[['Dis No']].count().reset_index()
 con_count.sort_values(['Dis No'], ascending = [False], inplace = True)
@@ -134,18 +141,6 @@ t3.sort_values(['Disaster Subgroup'], inplace = True) # Ordenamos por Subgrupo d
 # Colores de las categorias
 colors = ['#21e50d', '#ea16d4', '#b03a2e', '#16adea', '#ead016']
 
-# # Figura 5: Total de Eventos por Subgrupo de Desatre
-# y_ticks = np.round(np.linspace(0, max(t3['porcentaje_del_total'].values), 10),2)
-
-# plt.figure(dpi = 150, figsize = (10,8))
-# plt.title('Total de Eventos por Subtipo de Desastre', fontsize = 14)
-# plt.bar(t3['Disaster Subgroup'], t3['porcentaje_del_total'], color = colors, edgecolor = 'black')
-# plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-# plt.xlabel('')
-# plt.xticks(size = 8)
-# plt.yticks(ticks = y_ticks, size = 8)
-# plt.show()
-
 # Total de Muertes por subtipo de desastre
 numeric_var = ['Total Deaths', 'Total Affected', 'Total Damages (\'000 US$)']
 t4 = df.groupby(['Disaster Subgroup'])[numeric_var].sum().reset_index()
@@ -188,27 +183,6 @@ for col in list(t5.columns)[1:]:
         plt.yticks([])
     # plt.axis('off')
     plt.show()
-
-# Figura 5: Grafico de barras (% del total) de las variables numéricas por subtipo de desastres     
-
-# t55 = t5
-# t55['Número de Eventos'] = t3['porcentaje_del_total'].values
-# t55 = t55[['index', 'Número de Eventos', 'Afectados', 'Muertes', 'Daño en 000 USD']]
-
-# fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4, figsize = (25, 6), sharey = False)
-# # fig.suptitle('% Del Total por Subgrupo de Desastre')
-# axs = [ax1, ax2, ax3, ax4]
-# columnas = list(t55.columns)[1:]
-
-# for i in range(len(axs)):
-#     y_ticks = np.round(np.linspace(0, max(t55[columnas[i]].values), 10),2)
-    
-#     axs[i].bar(t55['index'], t55[columnas[i]].values, color = colors, edgecolor = 'black')
-#     axs[i].set(ylabel = columnas[i])
-#     axs[i].set_title(str(columnas[i]) , fontsize = 11)
-#     # axs[i].ticklabel_format(size = 6)
-#     axs[i].grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-#     axs[i].tick_params(labelsize = 8, axis='both', which='major')
 
 
 test = pd.pivot_table(df[~df['Disaster Subgroup'].isin(['Extra-terrestrial'])], values = 'Dis No', index = ['ISO'], 
@@ -286,7 +260,7 @@ for col in list(m3.columns)[1:]:
     
     plt.figure(dpi = 250, figsize = (10,10))
     plt.title('% ' + str(col.capitalize()), fontsize = 14)
-    plt.bar(m3['Index'], t5[col], color = colors, edgecolor = 'black')
+    plt.bar(m3['Index'], m3[col], color = colors, edgecolor = 'black')
     plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
     plt.xticks(size = 14)
     if col == 'Número de Eventos':
