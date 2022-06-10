@@ -10,6 +10,7 @@ Created on Sun Jan 30 17:36:05 2022
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import seaborn as sns
 
 # Se carga el archivo csv a un objeto DataFrame de pandas.
@@ -39,41 +40,42 @@ for d in range(len(bucket_decade) - 1):
 decade = pd.concat(decade) # Concatenamos c/u de los dataframes generados
 
 decade = decade.groupby(['Decada'])['Dis No'].sum().reset_index() # Agrupamos por década para contar los eventos
-decade['porcentaje_total'] = decade['Dis No'] / sum(decade['Dis No']) # Calculamos el % del total
-decade['Accumulative'] = decade['porcentaje_total'].values.cumsum() # % Acumulado por década
+decade['porcentaje_total'] = (decade['Dis No'] / sum(decade['Dis No']))*100 # Calculamos el % del total
+decade['Accumulative'] = (decade['porcentaje_total'].values.cumsum()) # % Acumulado por década
 
 # Figura 1: % Del total de eventos por Década
 y_ticks = np.round(np.linspace(min(decade['porcentaje_total'].values), max(decade['porcentaje_total'].values), 10),2)
 
-plt.figure(dpi = 150, figsize = (10,8))
-plt.title('% Del total de Eventos por Década', fontsize = 14)
+plt.figure(dpi = 200, figsize = (10,8))
+plt.title('% Del total de eventos por década', fontsize = 16)
 ax = sns.barplot(x = 'Decada', y = 'porcentaje_total', color = '#c81025', alpha = 0.8, data = decade)
-ax.bar_label(ax.containers[0], fmt = '%.2f')
+ax.bar_label(ax.containers[0], fmt = '%.1f%%', size = 14, padding = 1)
+ax.yaxis.set_major_formatter(mtick.PercentFormatter())
 plt.xlabel('')
-plt.ylabel('% del Total')
+plt.ylabel('', size = 14)
 plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-plt.xticks(size = 8)
-plt.yticks(ticks = y_ticks, size = 8)
+plt.xticks(size = 12)
+plt.yticks(ticks = y_ticks, size = 12)
 plt.show()
 
 # Figura 2: % Del Total de Eventos Acumulado por Década
 y_ticks = np.round(np.linspace(min(decade['Accumulative'].values), max(decade['Accumulative'].values), 10),2)
 
-plt.figure(dpi = 150, figsize = (10,8))
-plt.title('% Del Total de Eventos Acumulado por Década', fontsize = 14)
+plt.figure(dpi = 200, figsize = (10,8))
+plt.title('% Del total de eventos acumulado por década', fontsize = 16)
 ax = sns.barplot(x = 'Decada', y = 'Accumulative', color = '#c81025', alpha = 0.8, data = decade)
-ax.bar_label(ax.containers[0], fmt = '%.2f')
-
+ax.bar_label(ax.containers[0], fmt = '%.1f%%', size = 14, padding = 1)
+ax.yaxis.set_major_formatter(mtick.PercentFormatter())
 plt.xlabel('')
-plt.ylabel('% del Total ')
+plt.ylabel('', size = 14)
 plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-plt.xticks(size = 8)
-plt.yticks(ticks = y_ticks, size = 8)
+plt.xticks(size = 12)
+plt.yticks(ticks = y_ticks, size = 12)
 plt.show()
 
 # Se decide remover la información previa a 1970 para evitar sesgo en los datos
 # También se remueve el evento de subgrupo 'extra terrestrial' ya que solo hay un evento.
-df = df[(df.Year >= 1970) & (~df['Disaster Subgroup'].isin(['Extra-terrestrial']))]
+df = df.loc[(df.Year >= 1970) & (~df['Disaster Subgroup'].isin(['Extra-terrestrial']))]
 
 # Descripciones generales
 cc = df.loc[:, ['Year', 'Total Deaths', 'Total Affected', 'Total Damages (\'000 US$)']].describe()
@@ -111,7 +113,7 @@ plt.show()
 t1 = df.groupby(['Year'])['Dis No'].count().reset_index() # Conteo de eventos por año
 
 # Figura 3: Total de eventos por año
-plt.figure(dpi = 150, figsize = (10,8))
+plt.figure(dpi = 200, figsize = (10,8))
 plt.title('Total de Desastres por Año', fontsize = 14)
 plt.plot(t1.Year.values, t1['Dis No'].values, linewidth = 3, color = '#c81025')
 plt.ylabel('Número de Eventos')
@@ -122,14 +124,16 @@ t2 = df.groupby(['Year', 'Continent'])['Dis No'].count().reset_index() # Total d
 
 # Figura 4: Total de Eventos por Continente
 colors = {'Americas': '#ee2d21', 'Asia': '#f9f02d', 'Europe': '#3895e0', 'Africa': '#000000', 'Oceania': '#48f814'}
-plt.figure(dpi = 150, figsize = (10,8))
-plt.title('Total de Eventos por Continente por Año', fontsize = 12)
+plt.figure(dpi = 250, figsize = (12,8))
+plt.title('Total de eventos por continente y año', fontsize = 16)
 for value in list(set(t2.Continent.values)):
     temp = t2[t2.Continent == value]
     plt.plot(temp.Year.values, temp['Dis No'].values, linewidth = 1.5, color = colors[value], label = value)
     
-plt.ylabel('Número de Eventos')
-plt.legend()
+plt.ylabel('Número de eventos', size = 16)
+plt.legend(fontsize = 16, loc='upper left', fancybox = True, shadow = True, ncol=2)
+plt.xticks(size = 16)
+plt.yticks(size = 16)
 plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
 plt.show()
 
@@ -149,11 +153,11 @@ t4.sort_values(['Disaster Subgroup'], inplace = True)
 a = t4.iloc[:,[1,2,3]]
 X = a.values
 s = X.sum(axis = 0).T
-X = X/s
+X = (X/s)
 
-t5 = pd.DataFrame(X, index = t4.iloc[:,0].values, columns = a.columns).reset_index()
+t5 = pd.DataFrame(X*100, index = t4.iloc[:,0].values, columns = a.columns).reset_index()
 t5.columns = ['index', 'Muertes', 'Afectados', 'Daño en 000 USD']
-t5['Número de Eventos'] = t3['porcentaje_del_total'].values
+t5['Número de Eventos'] = t3['porcentaje_del_total'].values*100
 t5 = t5[['index', 'Número de Eventos', 'Afectados', 'Muertes', 'Daño en 000 USD']]
 
 ran = t5.iloc[:,[1,2,3,4]]
@@ -169,21 +173,41 @@ etiquetas = pd.DataFrame({'index': ['Biological', 'Climatological', 'Geophysical
 t5 = pd.merge(t5, etiquetas, how = 'left', left_on = ['index'], right_on = ['index'])
 t5 = t5[['Index', 'Número de Eventos', 'Afectados', 'Muertes', 'Daño en 000 USD']]
 
-# Figura 6 - 8: % Del total de x por Subtipo de Desastre
-for col in list(t5.columns)[1:]:
+# # Figura 6 - 8: % Del total de x por Subtipo de Desastre
+# for col in list(t5.columns)[1:]:
     
-    plt.figure(dpi = 250, figsize = (10,10))
-    plt.title('% ' + str(col.capitalize()), fontsize = 14)
-    plt.bar(t5['Index'], t5[col], color = colors, edgecolor = 'black')
-    plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-    plt.xticks(size = 14)
-    if col == 'Número de Eventos':
-        plt.yticks(ticks = y_ticks, size = 14)
-    else:
-        plt.yticks([])
-    # plt.axis('off')
-    plt.show()
+#     plt.figure(dpi = 250, figsize = (10,10))
+#     plt.title('% ' + str(col.capitalize()), fontsize = 16)
+#     plt.bar(t5['Index'], t5[col], color = colors, edgecolor = 'black')
+#     plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
+#     plt.xticks(size = 16)
+#     if col == 'Número de Eventos':
+#         plt.yticks(ticks = y_ticks, size = 16)
+#     else:
+#         plt.yticks([])
+#     # plt.axis('off')
+#     plt.show()
 
+labels = {'Biológico':'#21e50d', 'Climatológico':'#ea16d4', 'Geofísico':'#b03a2e', 'Hidrológico':'#16adea', 'Meteorológico':'#ead016'}
+y_ticks = np.round(np.linspace(0,max_ran + 10, 10),2)
+
+for col in list(t5.columns)[1:]:
+    fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,10), dpi = 250)
+    ax.set_title('% ' + str(col.capitalize()), fontsize = 20)
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.yaxis.set_tick_params(labelsize = 20)
+    ax.xaxis.set_tick_params(labelsize = 20)
+    ax.set_ylim(0, max_ran + 10)
+    ax.bar(t5['Index'], t5[col],  color = colors, edgecolor = 'black')
+    plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
+    ax.bar_label(ax.containers[0], fmt = '%.1f%%', size = 20, padding = 1)
+    
+    plt.yticks(ticks = y_ticks, size = 22)
+    for i, j in labels.items(): #Loop over color dictionary
+        ax.bar(t5['Index'], t5[col], width = 0, color = j, label = i)
+    ax.legend(loc = 'upper left', shadow = True, ncol = 1, fontsize = 22)
+
+    
 
 test = pd.pivot_table(df[~df['Disaster Subgroup'].isin(['Extra-terrestrial'])], values = 'Dis No', index = ['ISO'], 
                       columns = ['Disaster Subgroup'], aggfunc = 'count') # pivot de los datos para el heatmap
@@ -194,11 +218,13 @@ test.sort_values(['Total'], ascending = [False], inplace = True) # Ordenamos por
 # Figure 6: Mapa de Calor
 top = 10
 plt.figure(dpi = 250, figsize = (10,10))
-plt.title(f'''Mapa de Calor: Top {top} del total de Eventos por País''', fontsize = 16)
+plt.title(f'''Mapa de calor: Top {top} del total de eventos por país''', fontsize = 20)
 ax = sns.heatmap(test.head(top), linewidths = 0.1, annot = True, fmt = '.0f', 
-                 cbar = False, cmap = 'crest', annot_kws = {'fontsize':14})
-plt.ylabel('', size =14)
-plt.xlabel('', size = 14)
+                 cbar = False, cmap = 'crest', annot_kws = {'fontsize':18})
+plt.ylabel('')
+plt.xlabel('')
+plt.xticks(size = 13)
+plt.yticks(size = 18)
 plt.show()
 
 #Figura 8: Grid Por Categoría
@@ -245,15 +271,21 @@ X = a.values
 s = X.sum(axis = 0).T
 X = X/s
 
-m2 = pd.DataFrame(X, index = m1.iloc[:,0].values, columns = a.columns).reset_index()
+m2 = pd.DataFrame(X*100, index = m1.iloc[:,0].values, columns = a.columns).reset_index()
 m2.columns = ['index', 'Muertes', 'Afectados', 'Daño en 000 USD']
 
+
 m3 = m2
-m3['Número de Eventos'] = m0['porcentaje_del_total'].values
+m3['Número de Eventos'] = m0['porcentaje_del_total'].values*100
 m3 = m3[['index', 'Número de Eventos', 'Afectados', 'Muertes', 'Daño en 000 USD']]
 
 m3 = pd.merge(m3, etiquetas, how = 'left', left_on = ['index'], right_on = ['index'])
 m3 = m3[['Index', 'Número de Eventos', 'Afectados', 'Muertes', 'Daño en 000 USD']]
+
+ran = m3.iloc[:,[1,2,3,4]]
+ran = ran.values
+min_ran = np.min(ran)
+max_ran = np.max(ran)
 
 # Figura 6 - 8: % Del total de x por Subtipo de Desastre
 for col in list(m3.columns)[1:]:
@@ -269,3 +301,22 @@ for col in list(m3.columns)[1:]:
         plt.yticks([])
     # plt.axis('off')
     plt.show()
+    
+labels = {'Biológico':'#21e50d', 'Climatológico':'#ea16d4', 'Geofísico':'#b03a2e', 'Hidrológico':'#16adea', 'Meteorológico':'#ead016'}
+y_ticks = np.round(np.linspace(0,max_ran + 10, 10),2)
+
+for col in list(m3.columns)[1:]:
+    fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,10), dpi = 250)
+    ax.set_title('% ' + str(col.capitalize()), fontsize = 20)
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.yaxis.set_tick_params(labelsize = 20)
+    ax.xaxis.set_tick_params(labelsize = 20)
+    ax.set_ylim(0, max_ran + 10)
+    ax.bar(m3['Index'], m3[col],  color = colors, edgecolor = 'black')
+    plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
+    ax.bar_label(ax.containers[0], fmt = '%.1f%%', size = 20, padding = 1)
+    
+    plt.yticks(ticks = y_ticks, size = 22)
+    for i, j in labels.items(): #Loop over color dictionary
+        ax.bar(t5['Index'], t5[col], width = 0, color = j, label = i)
+    ax.legend(loc = 'upper left', shadow = True, ncol = 1, fontsize = 20)
