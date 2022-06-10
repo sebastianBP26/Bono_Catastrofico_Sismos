@@ -12,6 +12,7 @@ import pandas as pd
 from scipy.stats import poisson, uniform
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import seaborn as sns
     
 def cdf(x):
@@ -142,21 +143,23 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             # colors: diccionario con los colores para cada distribucion.
             colors = {'lognorm': '#273746', 'gamma':'#432746', 'pareto':'#17a589', 'burr12':'#581845'}
             linestyles = {'lognorm': 'solid', 'gamma':'dashed', 'pareto':'dashdot', 'burr12':'dotted'}
-
+            
             # Histrograma del vector x (sin fx(X))
             xt = np.linspace(min(x), max(x), 10)
-            plt.figure(dpi = 150, figsize = (10,8))
-            plt.title('Histogram' + '\n' + st, fontsize = 15)
+            figure, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
+            ax.set_title('Histogram' + '\n' + st, fontsize = 20)
             sns.histplot(data = pd.DataFrame(x, columns = ['Siniestros']), x = 'Siniestros', color = '#c81025',
-                          bins = bn, stat = 'density', label = 'Damaged')
-            plt.ylabel('Probabilidad')
-            plt.xlabel('Damaged')
-            plt.xticks(xt)
-            plt.legend()
+                          bins = bn, stat = 'density', label = 'Damaged', ax = ax)
+            ax.yaxis.set_tick_params(labelsize = 16)
+            ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+            ax.set_xlabel('Damaged', size = 16)
+            ax.set_ylabel('Density', size = 16)
+            plt.xticks(ticks = xt, size = 16)
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
             plt.show()
             
-            # Histograma de x y la mejor distribucion.
+                        
+            # Histograma de x y la mejor distribucion. (No es figura de la tesis)
             xt = np.linspace(min(x), max(x), 10)
             plt.figure(dpi = 150, figsize = (10,8))
             plt.title('Histogram' + '\n' + st, fontsize = 15)
@@ -174,24 +177,37 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
             plt.show()
             
+            
             cdf_function = cdf(x)
             rango = np.linspace(min(x), max(x), 100)
-            plt.figure(dpi = 150, figsize = (10,8))
-            plt.title('Funciones de Distribucion vs Funcion De Distribucion Empirica', fontsize = 14)
+            
+            # Inicio de figura
+            
+            figure, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
+            # Agregamos el titulo de la grafica
+            ax.set_title('Funciones de Distribucion vs Funcion De Distribucion Empirica', fontsize = 20) 
+            
+            # Graficamos cada una de las lineas
             for dist in distributions:
                 dist_hist = values[dist]['model']
                 Fx = dist_hist.cdf(rango)
-                plt.plot(rango,Fx, linewidth = 1.5, label = dist_hist.dist.name, color = colors[dist],
-                         linestyle = linestyles[dist])
-                
-            plt.plot(cdf_function.x.values, cdf_function.cdf.values, drawstyle = 'steps-post', marker = 'o', 
-                     color = '#c81025', label = 'cdf')
+                ax.plot(rango,Fx, linewidth = 1.5, label = dist_hist.dist.name, color = colors[dist],
+                          linestyle = linestyles[dist])
             
-            plt.xlabel('Damaged')
-            plt.ylabel(r'$P(X \leq x)$')
-            plt.legend()
+            # Graficamos la distribución empírica
+            ax.plot(cdf_function.x.values, cdf_function.cdf.values, drawstyle = 'steps-post', marker = 'o', 
+                      color = '#c81025', label = 'cdf')
+            
+            # Cambiamos ejes, y size de las xlabel, ticks, etc.
+            ax.yaxis.set_tick_params(labelsize = 16)
+            ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+            ax.set_xlabel('Damaged', size = 16)
+            ax.set_ylabel(r'$P(X \leq x)$', size = 16)
+            ax.legend()
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
             plt.show()
+            
+            # Fin de la figura
     
         return best_dist, best_p, values[best_dist], values, df, distributions
     

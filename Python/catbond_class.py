@@ -111,26 +111,35 @@ class CatBond():
         
     def get_sheet(self, params):
         
+        # Parametros de entrada
         self.n = params['simulaciones']
         self.maturity_time = params['maduracion']
         self.delta_pph = params['delta_pph']
         self.face_value = params['valor_facial']
         self.rate = params['tasa']
-           
-        self.time_range = list(range(0,params['maduracion'],5)) # Saltos de tiempos en dias  
+        
+        # Se crean dos listas para tener los tiempos y los umbrales
+        
+        # Saltos de tiempo de 5 en 5 dias
+        self.time_range = list(range(0,params['maduracion'],5)) 
+        # Umbral de cuantil de 0.7 a 0.9 de la distribucion elegida
         self.umbrales = list(np.linspace(self.hyp_test.dist.ppf(0.7), self.hyp_test.dist.ppf(0.9), 30))
         
-        ''' INICIO DEL PROCESO '''
+        # ''' INICIO DEL PROCESO '''
 
+        # La variable start_time nos permitira visualizar el tiempo en segundos para realizar todo el proceso
         start_time = time.time()
         
         print('Inicio del proceso: ')
         
+        # Se genera el proceso con los parametros
         self.Lt = cm.generate_process(n = self.n, T = self.maturity_time, m = self.delta_pph, 
                                       dist = self.hyp_test.dist, plot = params['plot'])
         
+        # Se crea una matriz de n (tiempos) x m (umbrales) de 0s
         ta = np.zeros([len(self.time_range), len(self.umbrales)])
         
+        # El ciclo for nos poermitira ir llenando la matriz ta con los precios estimados, para cada umbral y cada tiempo
         for i in range(len(self.umbrales)):
             for j in range(len(self.time_range)):
                 
@@ -142,30 +151,40 @@ class CatBond():
             
         print("--- %s seconds ---" % (time.time() - start_time))
         
+        # Al tiempo en el que estemos se le resta start_time = tiempo utilizado
         self.time_spend = time.time() - start_time
         
-        self.sheet = ta
+        # Se asigna ta al atributo sheet
+        self.sheet = ta 
+        # Se transforma en un pandas DataFrame
         self.sheet = pd.DataFrame(self.sheet)
         
+        # Se asignan los nombres de los renglones y columnas de la sabana
         self.sheet.columns = self.umbrales
         self.sheet.index = self.time_range
         
+        # Se obtiene el valor para ver si se quiere imprimir la sabana
         self.print_sheet = params['print_sheet']
         
         if self.print_sheet:
-
+            
+            # Se obtienen las variables X: tiempo, Y: umbrales y Z: Precios
             X, Y = np.meshgrid(self.time_range, self.umbrales)
             Z = np.array(self.sheet).T
             
+            # INICIO DE LA FIGURA
             plt.figure(dpi = 200, figsize = (12,12))
             ax = plt.axes(projection = '3d')
             ax.plot_surface(X, Y, Z, rstride=1, cstride=1,
                             cmap='plasma', edgecolor='none') # ['viridis', 'plasma', 'inferno', 'magma', 'cividis']
-            ax.set_xlabel('Tiempo')
-            ax.set_ylabel('Umbral')
-            ax.set_zlabel('Precio')
-            ax.set_title(f''' Sabana de precios CatBond: 
-                         Duracion Proceso: {str(round(self.time_spend/60,2))} | $F(x)$: {self.hyp_test.dist.dist.name.capitalize()} | T: {str(self.maturity_time)} | Simulaciones: {str(self.n)} | $\delta$: {str(round(self.delta_pph,5))}''')
+            ax.set_xlabel('Tiempo', fontsize = 13, labelpad = 6) # Se agrega nombre eje X
+            ax.set_ylabel('Umbral', fontsize = 13, labelpad = 10) # Se agrega nombre eje Y
+            ax.set_zlabel('Precio', fontsize = 13, labelpad = 6) # Se agrega nombre eje Z
+            ax.xaxis.set_tick_params(labelsize = 13) # size de los ticks X
+            ax.yaxis.set_tick_params(labelsize = 12) # size de los ticks Y
+            ax.zaxis.set_tick_params(labelsize = 13) # size de los ticks Y
+            ax.set_title(f'''| Duracion: {str(round(self.time_spend/60,2))} | $F(x)$: {self.hyp_test.dist.dist.name.capitalize()} | \n | T: {str(self.maturity_time)} | Simulaciones: {str(self.n)} | $\delta$: {str(round(self.delta_pph,5))}''',
+                         fontsize = 22)
                          
             
     def interactive_surface(self):

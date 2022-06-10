@@ -91,6 +91,22 @@ def get_accumulatted(data, rango, mu, print_plot = True):
     plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
     plt.show()
     
+    # INICIO DE LA FIGURA
+    clr = {'real': '#2eb094', 'estimado': '#b02e61'}
+    fig, ax = plt.subplots(nrows = 1, ncols = 1, dpi = 250, figsize = (10,8))
+    ax.set_title('Eventos Acumulados vs Eventos Estimados | ms = ' + str(np.round(mu,4)), fontsize = 15)
+    
+    for col in list(main.columns[1:]):    
+        ax.plot(main.tiempo.values,main[col].values, linewidth = 2, label = col, color = clr[col], markersize = 1)
+
+    ax.yaxis.set_tick_params(labelsize = 16)
+    ax.xaxis.set_tick_params(labelsize = 16)
+    ax.set_ylabel('Total de Eventos', size = 16)
+    ax.legend(fontsize = 20)
+    plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
+    plt.show()
+    # FIN DE LA FIGURA
+        
     return main
 
 class HomogeneousPoissonProcess():

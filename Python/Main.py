@@ -20,7 +20,7 @@ mw = 6.5 # Magnitud de sismos que utilizaremos como "filtro", es decir, sismos m
 
 # Carga de datos de severidad de sismos (Recoleccion de datos de la EM-DAT, NOAA y CENAPRED)
 severidad = pd.read_csv(r'G:\Mi unidad\Tesis (Avances)\BASES\damaged.csv', engine = 'python', encoding = 'unicode_escape')
-x = severidad.Damaged.values # array x con los valores de la severidad
+x = severidad.Damaged.values # Numpy array x con los valores de la severidad
               
 cb = CatBond() # Creamos una instancia de la clase CatBond
 
@@ -37,7 +37,7 @@ distributions = cb.hyp_test.dist_attributes # Valores de las distribuciones ajus
 # Parametros para la simulacion
 params = {'simulaciones': 10000, # n (Numero de caminatas de Lt a generar)
           'maduracion': 365*4, # Tiempo de maduracion del Bono.
-          'delta_pph': cb.hom_poisson.mu/360, # Tasa del proceso de Poisson (Tasa estimada con la clase Homogeneous Poisson Process)
+           'delta_pph': cb.hom_poisson.mu/360, # Tasa del proceso de Poisson (Tasa estimada con la clase Homogeneous Poisson Process)
           'valor_facial': 1, # Valor Facial del Bono.
           'tasa': -np.log(1/(1 + 0.05)), # Tasa de descuento/interes del bono (Se transforma a una tasa continua).
           'print_sheet': True, # Permite imprimir en pantalla la sabana.
