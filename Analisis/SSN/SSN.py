@@ -8,11 +8,14 @@ Created on Mon Sep 13 22:31:50 2021
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import seaborn as sns
 
 # Paqueteria plotly para las graficas
 import plotly.io as pio
 import plotly.express as px
+
+# sns.set_context(rc={"axes.labelsize":10})
 
 file = r'G:\Mi unidad\Tesis (Avances)\BASES\SSNMX_catalogo_19000101_20210913.csv'
 ssn = pd.read_csv(file, encoding = 'utf-8', engine = 'python')
@@ -95,30 +98,11 @@ ssn.reset_index(inplace = True)
 
 resumen = ssn.describe()
 
-''' Graficas '''
-
-# Histogramas
-# ssn.hist(bins = 50, figsize = (20,15))
-
-# Conteo de sismos por Epicentro (TOP 10)
-by_year = ssn.groupby( by = ['year'])[['index']].count().reset_index()
-x_year = np.arange(min(by_year.year.values),max(by_year.year.values),1)
-
-plt.figure(dpi = 150, figsize = (13,8))
-plt.title('Conteo de Sismos por Año', fontsize = 12)
-ax = sns.barplot(x = 'year', y = 'index', data = by_year)
-plt.xticks(rotation = 90, fontsize = 7)
-plt.xlabel('')
-# ax.bar_label(ax.containers[0])
-
-
 df_prom = ssn[ssn.year == 2020]
-# print('Contamos con el ' + str(100*np.round(len(df_prom)/len(ssn),4)) + ' % de información para promedios.')
-print('Promedio diario de sismos en México: ' + str(int(len(df_prom)/12)))
+print('Promedio mensual de sismos en México: ' + str(int(len(df_prom)/12)))
 print('Promedio Magnitud: ' + str(np.mean(df_prom.Magnitud.values)))
 
-# Promedios: 
-    
+# FUNCION PARA LAS GRAFICAS
 def metricas(x, flag = True, round_n = 2):
     
     count = len(x)
@@ -155,33 +139,32 @@ def metricas(x, flag = True, round_n = 2):
     return m, str_values
 
 
-'''HISTOGRAMAS'''
-
+# HISTOGRAMAS
 # Histograma de la variable Magnitud
-x = np.arange(0,max(ssn.Magnitud.values),0.5)
-plt.figure(dpi = 150, figsize = (10,8))
-plt.title('Histograma de la variable Magnitud', fontsize = 12)
+fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
+ax.set_title('Histograma de la variable Magnitud', fontsize = 22)
 sns.histplot(data = ssn, x = 'Magnitud', color = '#c81025',
-             bins = 40, stat = 'probability', label = 'Magnitud')
-plt.xlabel(metricas(ssn.Magnitud.values)[1])
-plt.ylabel('Probabilidad')
-plt.xticks(x)
-plt.legend()
+             bins = 40, stat = 'probability', label = 'Magnitud', ax = ax)
+ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+ax.yaxis.set_tick_params(labelsize = 18)
+ax.xaxis.set_tick_params(labelsize = 18)
+ax.legend(loc = 'upper left', shadow = True, ncol = 1, fontsize = 22)
+ax.set_xlabel(metricas(ssn.Magnitud.values)[1], fontsize = 16)
+ax.set_ylabel('Probabilidad', fontsize = 18)
 plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-plt.show()
 
 # Histograma de la variable Profundidad
-x = np.arange(0,max(ssn.Profundidad.values),50)
-plt.figure(dpi = 150, figsize = (10,8))
-plt.title('Histograma de la variable Profundidad', fontsize = 12)
+fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
+ax.set_title('Histograma de la variable Profundidad', fontsize = 22)
 sns.histplot(data = ssn, x = 'Profundidad', color = '#c81025',
-             bins = 40, stat = 'probability', label = 'Profundidad')
-plt.xlabel(metricas(ssn.Profundidad.values)[1])
-plt.ylabel('Probabilidad')
-plt.xticks(x)
-plt.legend()
-plt.grid(color = '#191a1a', linestyle='-', linewidth = 0.1, alpha = 0.5)
-plt.show()
+             bins = 40, stat = 'probability', label = 'Profundidad', ax = ax)
+ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+ax.yaxis.set_tick_params(labelsize = 18)
+ax.xaxis.set_tick_params(labelsize = 18)
+ax.legend(loc = 'upper right', shadow = True, ncol = 1, fontsize = 22)
+ax.set_xlabel(metricas(ssn.Magnitud.values)[1], fontsize = 16)
+ax.set_ylabel('Probabilidad', fontsize = 18)
+plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
 
 # Matriz de correlaciones
 corr_matrix = ssn[['Magnitud', 'Latitud', 'Longitud', 'Profundidad','year', 'month', 'day', 'quarter']].corr()
@@ -213,20 +196,18 @@ test = pd.pivot_table(ssn_temp, values = 'index', index = ['day'],
 # avg = int(np.round(np.nanmean(test),0))
 
 plt.figure(dpi = 250, figsize = (12,12))
-plt.title('Heatmap: Conteo de Sismos por Mes/Día', fontsize = 12)
-ax = sns.heatmap(test, linewidths = 0.1, annot = True, fmt = '.0f', cmap = 'YlGnBu')
-# plt.xlabel('Mes \n Promedio de Sismos Mensual: ' + str(avg))
-plt.xlabel('Mes')
-plt.ylabel('Día')
+plt.title('Heatmap: Conteo de Sismos por Mes/Día', fontsize = 20)
+ax = sns.heatmap(test, linewidths = 0.1, annot = True, fmt = '.0f', cmap = 'YlGnBu', annot_kws = {'fontsize':14})
+plt.xlabel('')
+plt.ylabel('')
+plt.xticks(size = 15)
+plt.yticks(size = 15)
+plt.yticks(rotation = 0)
 plt.show()
 
 # Heatmap Hour vs Day
-
 test = pd.pivot_table(ssn, values = 'index', index = ['day'], 
                       columns = ['hour'], aggfunc = 'count')
-
-# avg = int(np.round(np.nanmean(test),0))
-
 plt.figure(dpi = 250, figsize = (12,14))
 plt.title('Heatmap: Conteo de Sismos por Día/Hora', fontsize = 12)
 ax = sns.heatmap(test, linewidths = 0.1, annot = True, fmt = '.0f', 
@@ -244,6 +225,7 @@ plt.figure(dpi = 250, figsize = (12,14))
 plt.title('Heatmap: Conteo de Sismos por Día/Hora', fontsize = 12)
 ax = sns.heatmap(test, linewidths = 0.1, annot = True, fmt = '.0f', 
                  cmap = 'YlGnBu', annot_kws={'size': 7})
+
 plt.xlabel('Hora')
 plt.ylabel('Día')
 plt.show()
@@ -282,9 +264,16 @@ temp = ssn[['Magnitud', 'Latitud', 'Longitud', 'Profundidad']]
 
 g = sns.pairplot(temp, diag_kind = 'hist', diag_kws = {'alpha':0.99, 'bins':40})
 g.fig.subplots_adjust(top = 0.95)
-g.fig.suptitle('Resumen General de las Variables Numéricas')
-g.fig.dpi = 150
-g.fig.set_size_inches(15,15)
+g.fig.suptitle('Resumen General de las Variables Numéricas', fontsize = 20)
+g.fig.dpi = 200
+g.fig.set_size_inches(10,10)
+# sns.set_context("paper", rc={"axes.labelsize":30})
+
+# fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (15,15), dpi = 200)
+# ax.set_title('Resumen General de las Variables Numéricas', fontsize = 22)
+# g = sns.pairplot(temp, diag_kind = 'hist', diag_kws = {'alpha':0.99, 'bins':40})
+# ax.yaxis.set_tick_params(labelsize = 14)
+# ax.xaxis.set_tick_params(labelsize = 14)
 
 
 def stats(df, g, t):
@@ -324,15 +313,16 @@ g.fig.set_size_inches(10,8)
 count_q = ssn_temp.groupby( by = ['Trimestre','month','day'])['epicentro'].count().reset_index()
 count_q.columns = ['Trimestre', 'Mes', 'Dia', 'Total']
 
-g = sns.catplot(data = count_q, x = 'Trimestre', y = 'Total',
-                kind = 'box', order = ['Q1','Q2','Q3','Q4'])
-g.fig.subplots_adjust(top = 0.95)
-g.fig.suptitle('Diagrama de Caja: Total de Sismos Trimestral')
-g.fig.dpi = 100
-g.fig.set_size_inches(10,8)
+fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
+ax.set_title('Diagrama de Caja: Total de Sismos Trimestral', fontsize = 22)
+sns.boxplot(data = count_q, x = 'Trimestre', y = 'Total', order = ['Q1','Q2','Q3','Q4'])
+ax.yaxis.set_tick_params(labelsize = 18)
+ax.xaxis.set_tick_params(labelsize = 18)
+ax.set_xlabel('', fontsize = 18)
+ax.set_ylabel('', fontsize = 18)
+plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
 
 # Conteo de sismos por Mes y Día
-
 count_md = ssn.groupby( by = ['month','day'])['epicentro'].count().reset_index()
 count_md.columns = ['Mes', 'dia', 'Total']
 meses = pd.DataFrame({ 'Mes': [1,2,3,4,5,6,7,8,9,10,11,12],
@@ -343,16 +333,19 @@ count_md.drop(['Mes'], axis = 1, inplace = True)
 count_md.columns = ['dia', 'Total', 'Mes']
 count_md = count_md[(count_md.Mes != 'Feb') | (count_md.dia != 29)]
 
-g = sns.catplot(data = count_md, x = 'Mes', y = 'Total', 
-                kind = 'box', order = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-                                 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'])
-g.fig.subplots_adjust(top = 0.95)
-g.fig.suptitle('Diagrama de Caja: Total de Sismos Mensual')
-g.fig.dpi = 150
-g.fig.set_size_inches(10,8)
+
+fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
+ax.set_title('Diagrama de Caja: Total de Sismos Mensual', fontsize = 22)
+sns.boxplot(data = count_md, x = 'Mes', y = 'Total', order = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                                                              'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'])
+ax.yaxis.set_tick_params(labelsize = 18)
+ax.xaxis.set_tick_params(labelsize = 18)
+ax.set_xlabel('', fontsize = 18)
+ax.set_ylabel('', fontsize = 18)
+plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
+
 
 # Boxplot
-
 count_estado = ssn.groupby( by = ['epicentro','month', 'day'])['Magnitud'].count().reset_index()
 
 plt.figure(dpi = 150, figsize = (10,8))
@@ -388,7 +381,7 @@ g = sns.FacetGrid(ssn, col = 'categoria', sharex = True, sharey = True, hue = 'T
                   col_order = ['Daños Mínimos', 'Daños Menores', 'Daños Ligeros',
                                                    'Daños Severos', 'Daños Graves', 'Gran Terremoto'])
 g.map_dataframe(sns.scatterplot, x = 'Latitud', y = 'Longitud')
-g.fig.dpi = 150
+g.fig.dpi = 200
 g.fig.set_size_inches(15,4)
 
 for ax in g.axes.ravel():
