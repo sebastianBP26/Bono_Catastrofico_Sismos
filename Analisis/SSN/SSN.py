@@ -162,7 +162,7 @@ ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
 ax.yaxis.set_tick_params(labelsize = 18)
 ax.xaxis.set_tick_params(labelsize = 18)
 ax.legend(loc = 'upper right', shadow = True, ncol = 1, fontsize = 22)
-ax.set_xlabel(metricas(ssn.Magnitud.values)[1], fontsize = 16)
+ax.set_xlabel(metricas(ssn.Profundidad.values)[1], fontsize = 16)
 ax.set_ylabel('Probabilidad', fontsize = 18)
 plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
 

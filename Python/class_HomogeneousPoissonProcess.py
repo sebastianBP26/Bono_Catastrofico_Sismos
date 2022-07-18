@@ -78,30 +78,30 @@ def get_accumulatted(data, rango, mu, print_plot = True):
     main['cummulative_est'] = main['cummulative_est'].fillna(method = 'pad')
     main.columns = ['tiempo', 'real', 'estimado']
     
-    # Agregar las etiquetas
-    clr = {'real': '#2eb094', 'estimado': '#b02e61'}
-    plt.figure(dpi = 150, figsize = (10,8))
-    plt.title('Eventos Acumulados vs Eventos Estimados | ms = ' + str(np.round(mu,4)), fontsize = 15)
+    # # Agregar las etiquetas
+    # clr = {'real': '#2eb094', 'estimado': '#b02e61'}
+    # plt.figure(dpi = 150, figsize = (10,8))
+    # plt.title('Eventos Acumulados vs Eventos Estimados | ms = ' + str(np.round(mu,4)), fontsize = 15)
     
-    for col in list(main.columns[1:]):    
-        plt.plot(main.tiempo.values,main[col].values, linewidth = 2, label = col, color = clr[col])
+    # for col in list(main.columns[1:]):    
+    #     plt.plot(main.tiempo.values,main[col].values, linewidth = 2, label = col, color = clr[col])
     
-    plt.ylabel('Total de Eventos')
-    plt.legend()
-    plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
-    plt.show()
+    # plt.ylabel('Total de Eventos')
+    # plt.legend()
+    # plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
+    # plt.show()
     
     # INICIO DE LA FIGURA
     clr = {'real': '#2eb094', 'estimado': '#b02e61'}
     fig, ax = plt.subplots(nrows = 1, ncols = 1, dpi = 250, figsize = (10,8))
-    ax.set_title('Eventos Acumulados vs Eventos Estimados | ms = ' + str(np.round(mu,4)), fontsize = 15)
+    ax.set_title('Eventos Acumulados vs Eventos Estimados | ms = ' + str(np.round(mu,4)), fontsize = 22)
     
     for col in list(main.columns[1:]):    
-        ax.plot(main.tiempo.values,main[col].values, linewidth = 2, label = col, color = clr[col], markersize = 1)
+        ax.plot(main.tiempo.values,main[col].values, linewidth = 4, label = col, color = clr[col], markersize = 1)
 
-    ax.yaxis.set_tick_params(labelsize = 16)
-    ax.xaxis.set_tick_params(labelsize = 16)
-    ax.set_ylabel('Total de Eventos', size = 16)
+    ax.yaxis.set_tick_params(labelsize = 20)
+    ax.xaxis.set_tick_params(labelsize = 20)
+    ax.set_ylabel('Total de Eventos', size = 20)
     ax.legend(fontsize = 20)
     plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
     plt.show()

@@ -151,7 +151,7 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             sns.histplot(data = pd.DataFrame(x, columns = ['Siniestros']), x = 'Siniestros', color = '#c81025',
                           bins = bn, stat = 'density', label = 'Damaged', ax = ax)
             ax.yaxis.set_tick_params(labelsize = 16)
-            ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
+            ax.yaxis.set_major_formatter(mtick.PercentFormatter(1))
             ax.set_xlabel('Damaged', size = 16)
             ax.set_ylabel('Density', size = 16)
             plt.xticks(ticks = xt, size = 16)
@@ -185,16 +185,16 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             
             figure, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (10,8), dpi = 250)
             # Agregamos el titulo de la grafica
-            ax.set_title('Funciones de Distribucion vs Funcion De Distribucion Empirica', fontsize = 20) 
+            ax.set_title('Funciones de Distribucion vs Funcion De Distribucion Empirica', fontsize = 22) 
             
             # Graficamos cada una de las lineas
             for dist in distributions:
                 dist_hist = values[dist]['model']
                 Fx = dist_hist.cdf(rango)
-                ax.plot(rango,Fx, linewidth = 1.5, label = dist_hist.dist.name, color = colors[dist],
+                ax.plot(rango,Fx, linewidth = 2, label = dist_hist.dist.name, color = colors[dist],
                           linestyle = linestyles[dist])
             
-            # Graficamos la distribución empírica
+            # Graficamos la distribucion empirica
             ax.plot(cdf_function.x.values, cdf_function.cdf.values, drawstyle = 'steps-post', marker = 'o', 
                       color = '#c81025', label = 'cdf')
             
@@ -203,7 +203,7 @@ def hypothesis_testing(x, distributions = ['lognorm', 'gamma', 'pareto', 'burr12
             ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
             ax.set_xlabel('Damaged', size = 16)
             ax.set_ylabel(r'$P(X \leq x)$', size = 16)
-            ax.legend()
+            ax.legend(fontsize = 20)
             plt.grid(color = '#191a1a', linestyle='--', linewidth = 0.1, alpha = 0.5)
             plt.show()
             
